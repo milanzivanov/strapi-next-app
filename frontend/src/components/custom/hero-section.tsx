@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import { StrapiImage } from "@/components/custom/strapi-image";
 import Link from "next/link";
 
 import type { TImage, TLink } from "@/types";
@@ -29,20 +29,16 @@ export function HeroSection({ data }: { readonly data: IHeroSectionProps }) {
     return null;
   }
 
-  const { heading, subHeading, link } = data;
+  const { heading, subHeading, link, image } = data;
 
   console.dir(data, { depth: null });
   return (
     <header className={styles.header}>
-      <img
-        alt="Background"
-        className={styles.backgroundImage}
+      <StrapiImage
+        alt={image.alternativeText ?? "no alternative text"}
+        className="absolute inset-0 object-cover w-full h-full aspect/16:9"
+        src={image.url}
         height={1080}
-        src="https://images.pexels.com/photos/7552374/pexels-photo-7552374.jpeg"
-        style={{
-          aspectRatio: "1920/1080",
-          objectFit: "cover"
-        }}
         width={1920}
       />
       <div className={styles.overlay}>

@@ -1,6 +1,7 @@
 export interface BaseParams {
   [key: string]: string | string[] | undefined;
 }
+import type { TBlocks } from "@/app/page";
 
 export interface RouteParams extends BaseParams {
   documentId?: string;
@@ -37,8 +38,8 @@ export type THomePage = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  blocks: any; // we will change this soon
+
+  blocks: TBlocks[];
 };
 
 export type THeader = {

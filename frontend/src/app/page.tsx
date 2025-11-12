@@ -1,53 +1,41 @@
-import { HeroSection } from "@/components/custom/hero-section";
-import qs from "qs";
+import { loaders } from "@/data/loaders";
+import { validateApiResponse } from "@/lib/error-handler";
 
-const homePageQuery = qs.stringify({
-  populate: {
-    blocks: {
-      on: {
-        "layout.hero-section": {
-          populate: {
-            image: {
-              fields: ["url", "alternativeText"]
-            },
-            link: {
-              populate: true
-            }
-          }
-        }
-      }
-    }
-  }
-});
+import {
+  HeroSection,
+  type IHeroSectionProps
+} from "@/components/custom/hero-section";
+import {
+  FeaturesSection,
+  type IFeaturesSectionProps
+} from "@/components/custom/features-section";
 
-async function getStrapiData(path: string) {
-  const baseUrl = "http://localhost:1337";
+// Union type of all possible block components
+export type TBlocks = IHeroSectionProps | IFeaturesSectionProps;
 
-  const url = new URL(path, baseUrl);
-  url.search = homePageQuery;
-
-  try {
-    const response = await fetch(url.href);
-    if (!response.ok) {
-      throw new Error("Failed to fetch data from Strapi");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching data from Strapi:", error);
+function blockRenderer(block: TBlocks, index: number) {
+  switch (block.__component) {
+    case "layout.hero-section":
+      return <HeroSection key={index} data={block as IHeroSectionProps} />;
+    case "layout.features-section":
+      console.log("Sections data:", block);
+      return (
+        <FeaturesSection key={index} data={block as IFeaturesSectionProps} />
+      );
+    default:
+      return null;
   }
 }
 
 export default async function Home() {
-  const strapiData = await getStrapiData("/api/home-page");
+  const homePageData = await loaders.getHomePageData();
+  const data = validateApiResponse(homePageData, "home page");
 
-  console.dir(strapiData.data, { depth: null });
+  console.dir(data, { depth: null });
 
-  const { blocks } = strapiData.data;
+  const { blocks } = data;
 
   return (
-    <main className="container mx-auto py-6">
-      <HeroSection data={blocks[0]} />
-    </main>
+    <main>{blocks.map((block, index) => blockRenderer(block, index))}</main>
   );
 }
