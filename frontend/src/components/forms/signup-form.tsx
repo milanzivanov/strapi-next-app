@@ -1,5 +1,8 @@
 "use client";
+
+import { actions } from "@/data/actions";
 import Link from "next/link";
+
 
 import {
   CardTitle,
@@ -29,7 +32,7 @@ const styles = {
 export function SignupForm() {
   return (
     <div className={styles.container}>
-      <form>
+       <form action={actions.auth.registerUserAction}>
         <Card>
           <CardHeader className={styles.header}>
             <CardTitle className={styles.title}>Sign Up</CardTitle>
