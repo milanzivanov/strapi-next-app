@@ -61,7 +61,7 @@ async function getMetaData(): Promise<TStrapiResponse<TMetaData>> {
     fields: ["title", "description"]
   });
 
-  console.log("////// getMetaData", query);
+  // console.log("////// getMetaData", query);
 
   const url = new URL("/api/global", baseUrl);
   url.search = query;

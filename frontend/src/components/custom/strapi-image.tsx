@@ -14,7 +14,7 @@ interface IStrapiMediaProps {
 
 export function getStrapiMedia(url: string | null) {
   const strapiURL = getStrapiURL();
-  console.log("/////// strapiURL", strapiURL);
+  // console.log("/////// strapiURL", strapiURL);
   if (url == null) return null;
   if (url.startsWith("data:")) return url;
   if (url.startsWith("http") || url.startsWith("//")) return url;
@@ -28,7 +28,7 @@ export function StrapiImage({
   ...rest
 }: Readonly<IStrapiMediaProps>) {
   const imageUrl = getStrapiMedia(src);
-  console.log("/////// imageUrl", imageUrl);
+  // console.log("/////// imageUrl", imageUrl);
   if (!imageUrl) return null;
   return (
     <Image
