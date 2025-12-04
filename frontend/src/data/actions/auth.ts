@@ -1,18 +1,33 @@
 "use server";
 
 import { z } from "zod";
+
+import { services } from "@/data/services";
+import { isAuthError } from "@/data/services/auth";
+
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
 import { SignupFormSchema, type FormState } from "@/data/validation/auth";
+
+const config = {
+    maxAge: 60 * 60 * 24 * 7, // 1 week
+    path: "/",
+    domain: process.env.HOST ?? "localhost",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+};
+
 
 export async function registerUserAction(prevState: FormState, formData: FormData): Promise<FormState> {
     console.log("Hello from register user action");
 
+    const fields = {
+        username: formData.get("username") as string,
+        password: formData.get("password") as string,
+        email: formData.get("email") as string,
+    };
 
-    // const fields = {
-    //     username: formData.get("username") as string,
-    //     email: formData.get("email") as string,
-    //     password: formData.get("password") as string,
-    // }
-    const fields = Object.fromEntries(formData.entries());
 
     const validatedFields = SignupFormSchema.safeParse(fields);
     // console.log("validatedFields", validatedFields);
@@ -33,18 +48,44 @@ export async function registerUserAction(prevState: FormState, formData: FormDat
       }
     
       console.log("Validation successful:", validatedFields.data);
+
+
+      const responseData = await services.auth.registerUserService(
+        validatedFields.data
+      );
     
-      // TODO: WE WILL ADD STRAPI LOGIC HERE LATER
+      if (!responseData) {
+        return {
+          success: false,
+          message: "Ops! Something went wrong. Please try again.",
+          strapiErrors: null,
+          zodErrors: null,
+          data: {
+            ...prevState.data,
+            ...fields,
+          },
+        };
+      }
+    
+      // Check if responseData is an error response
+      if (isAuthError(responseData)) {
+        return {
+          success: false,
+          message: "Failed to Register.",
+          strapiErrors: responseData.error,
+          zodErrors: null,
+          data: {
+            ...prevState.data,
+            ...fields,
+          },
+        };
+      }
+    
+      console.log("#############");
+      console.log("User Registered Successfully", responseData);
+      console.log("#############");
 
-
-    return {
-        success: true,
-        message: "User registration successful",
-        strapiErrors: null,
-        zodErrors: null,
-        data: {
-        ...prevState.data,
-        ...fields,
-        },
-    }
+      const cookieStore = await cookies();
+      cookieStore.set("jwt", responseData.jwt, config);
+      redirect("/dashboard");
 }

@@ -28,6 +28,7 @@ export type SignupFormValues = z.infer<typeof SignupFormSchema>;
 export type FormState = {
   success?: boolean;
   message?: string;
+  loading?: boolean;
   data?: {
     identifier?: string;
     username?: string;

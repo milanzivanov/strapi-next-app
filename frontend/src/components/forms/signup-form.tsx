@@ -16,10 +16,10 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-
 
 import { ZodErrors } from "@/components/custom/zod-errors";
+import { StrapiErrors } from "@/components/custom/strapi-errors";
+import { SubmitButton } from "../custom/submit-button";
 
 
 const INITIAL_STATE: FormState = {
@@ -96,7 +96,8 @@ export function SignupForm() {
             </div>
           </CardContent>
           <CardFooter className={styles.footer}>
-            <Button className={styles.button}>Sign Up</Button>
+            <SubmitButton text="Sign Up" loadingText="Signing Up..." loading={formState?.loading} />
+            <StrapiErrors error={formState?.strapiErrors} />
           </CardFooter>
         </Card>
         <div className={styles.prompt}>
