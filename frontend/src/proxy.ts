@@ -22,7 +22,7 @@ function isProtectedRoute(path: string): boolean {
   });
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const currentPath = request.nextUrl.pathname;
 
   // Debug: Log all requests to see if middleware is running
@@ -75,7 +75,7 @@ export const config = {
 // import { NextResponse } from "next/server";
 // import type { NextRequest } from "next/server";
 
-// export function middleware(request: NextRequest) {
+// export function proxy(request: NextRequest) {
 //   const currentPath = request.nextUrl.pathname;
 
 //   // Debug: Log all requests to see if middleware is running
