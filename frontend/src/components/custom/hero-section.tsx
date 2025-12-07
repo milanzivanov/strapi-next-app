@@ -1,7 +1,8 @@
-import { StrapiImage } from "@/components/custom/strapi-image";
 import Link from "next/link";
-
+import { services } from "@/data/services";
 import type { TImage, TLink } from "@/types";
+
+import { StrapiImage } from "@/components/custom/strapi-image";
 
 export interface IHeroSectionProps {
   id: number;
@@ -24,10 +25,13 @@ const styles = {
     "mt-8 inline-flex items-center justify-center px-6 py-3 text-base font-medium text-black bg-white rounded-md shadow hover:bg-gray-100 transition-colors"
 };
 
-export function HeroSection({ data }: { readonly data: IHeroSectionProps }) {
+export async function HeroSection({ data }: { readonly data: IHeroSectionProps }) {
   if (!data) {
     return null;
   }
+
+  const user = await services.auth.getUserMeService();
+  const userLoggedIn = user.success;
 
   const { heading, subHeading, link, image } = data;
 
@@ -44,8 +48,8 @@ export function HeroSection({ data }: { readonly data: IHeroSectionProps }) {
       <div className={styles.overlay}>
         <h1 className={styles.heading}>{heading}</h1>
         <p className={styles.subheading}>{subHeading}</p>
-        <Link className={styles.button} href={link.href}>
-          {link.label}
+        <Link className={styles.button} href={userLoggedIn ? "/dashboard" : link.href}>
+          {userLoggedIn ? "Dashboard" : link.label}
         </Link>
       </div>
     </header>
