@@ -1,8 +1,14 @@
 "use client";
-import React from "react";
-import { cn } from "@/lib/utils";
 
+import { cn } from "@/lib/utils";
 import type { TAuthUser } from "@/types";
+
+import { actions } from "@/data/actions";
+import { useActionState } from "react";
+import type { ProfileFormState } from "@/data/validation/profile";
+
+import { ZodErrors } from "@/components/custom/zod-errors";
+import { StrapiErrors } from "@/components/custom/strapi-errors";
 
 import { SubmitButton } from "@/components/custom/submit-button";
 import { Input } from "@/components/ui/input";
@@ -25,12 +31,25 @@ const styles = {
   creditText: "font-bold text-md mx-1",
 };
 
+const INITIAL_STATE: ProfileFormState = {
+    success: false,
+    message: undefined,
+    strapiErrors: null,
+    zodErrors: null,
+  };
+
 export function ProfileForm({
   user,
   className,
 }: IProfileFormProps & {
   readonly className?: string;
 }) {
+    const [formState, formAction] = useActionState(
+      actions.profile.updateProfileAction,
+      INITIAL_STATE
+    );
+
+
   if (!user) {
     return (
       <div className={cn(styles.form, className)}>
@@ -39,8 +58,9 @@ export function ProfileForm({
     );
   }
 
+  
   return (
-    <form className={cn(styles.form, className)}>
+    <form action={formAction} className={cn(styles.form, className)}>
       <div className={styles.container}>
         <div className={styles.topRow}>
           <Input
@@ -66,16 +86,18 @@ export function ProfileForm({
               id="firstName"
               name="firstName"
               placeholder="First Name"
-              defaultValue={user.firstName || ""}
+              defaultValue={formState?.data?.firstName || user.firstName || ""}
             />
+            <ZodErrors error={formState?.zodErrors?.firstName} />
           </div>
           <div className={styles.fieldGroup}>
             <Input
               id="lastName"
               name="lastName"
               placeholder="Last Name"
-              defaultValue={user.lastName || ""}
+              defaultValue={formState?.data?.lastName || user.lastName  || ""}
             />
+            <ZodErrors error={formState?.zodErrors?.lastName} />
           </div>
         </div>
         <div className={styles.fieldGroup}>
@@ -84,9 +106,11 @@ export function ProfileForm({
             name="bio"
             placeholder="Write your bio here..."
             className={styles.textarea}
-            defaultValue={user.bio || ""}
+            defaultValue={formState?.data?.bio || user.bio || ""}
           />
+          <ZodErrors error={formState?.zodErrors?.bio} />
         </div>
+        <StrapiErrors error={formState?.strapiErrors} />
       </div>
       <div className={styles.buttonContainer}>
         <SubmitButton text="Update Profile" loadingText="Saving Profile" />
