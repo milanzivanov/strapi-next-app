@@ -1,7 +1,7 @@
 
 import { registerUserService, loginUserService,getUserMeService, } from "./auth";
-import { updateProfileService } from "./profile";
-
+import { updateProfileService, updateProfileImageService } from "./profile";
+import { fileUploadService, fileDeleteService } from "./file";
 
 export const services = {
   auth: {
@@ -11,5 +11,10 @@ export const services = {
   },
   profile: {
     updateProfileService,
+    updateProfileImageService,
+  },
+  file: {
+    fileUploadService,
+    fileDeleteService,
   },
 };

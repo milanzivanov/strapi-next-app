@@ -1,6 +1,6 @@
 import { registerUserAction,  logoutUserAction,
     getAuthTokenAction, loginUserAction } from "./auth";
-    import { updateProfileAction } from "./profile";
+    import { updateProfileAction, updateProfileImageAction } from "./profile";
 
 export const actions = {
     auth: {
@@ -11,5 +11,6 @@ export const actions = {
     },
     profile: {
         updateProfileAction: updateProfileAction,
+        updateProfileImageAction: updateProfileImageAction,
     },
 }
