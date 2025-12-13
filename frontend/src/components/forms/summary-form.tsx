@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { cn, extractYouTubeID } from "@/lib/utils";
+import { api } from "@/data/data-api";
 
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/custom/submit-button";
@@ -20,7 +21,7 @@ interface IErrors {
 
 const INITIAL_STATE = {
   message: null,
-  name: "",
+  name: ""
 };
 
 export function SummaryForm() {
@@ -43,7 +44,7 @@ export function SummaryForm() {
       setError({
         ...INITIAL_STATE,
         message: "Invalid Youtube Video ID",
-        name: "Invalid Id",
+        name: "Invalid Id"
       });
       return;
     }
@@ -54,14 +55,36 @@ export function SummaryForm() {
       // Step 1: Get transcript
       currentToastId = toast.loading("Getting transcript...");
 
+      const transcriptResponse = await api.post<
+        ITranscriptResponse,
+        { videoId: string }
+      >("/api/transcript", { videoId: processedVideoId });
+
+      if (!transcriptResponse.success) {
+        toast.dismiss(currentToastId);
+        toast.error(transcriptResponse.error?.message);
+        return;
+      }
+
+      const fullTranscript = transcriptResponse.data?.fullTranscript;
+
+      if (!fullTranscript) {
+        toast.dismiss(currentToastId);
+        toast.error("No transcript data found");
+        return;
+      }
+
+      console.log(fullTranscript);
+
       // Step 2: Generate summary
       toast.dismiss(currentToastId);
       currentToastId = toast.loading("Generating summary...");
 
       // Step 3: Save summary to database
-      toast.dismiss(currentToastId);
-      currentToastId = toast.loading("Saving summary...");
+      // toast.dismiss(currentToastId);
+      // currentToastId = toast.loading("Saving summary...");
 
+      toast.dismiss(currentToastId);
       toast.success("Summary Created and Saved!");
       setValue("");
 
@@ -87,7 +110,7 @@ export function SummaryForm() {
     : "";
 
   return (
-    <div className="w-1/2">
+    <div className="w-full flex-1 mx-4">
       <form onSubmit={handleFormSubmit} className="flex gap-2 items-center">
         <Input
           name="videoId"
