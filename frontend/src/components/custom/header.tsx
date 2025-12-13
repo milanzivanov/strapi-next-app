@@ -6,10 +6,11 @@ import type { THeader } from "@/types";
 import { Logo } from "@/components/custom/logo";
 import { Button } from "@/components/ui/button";
 import { LoggedInUser } from "./logged-in-user";
+import { SummaryForm } from "@/components/forms/summary-form";
 
 const styles = {
   header:
-    "flex  items-center justify-between px-4 py-3 bg-white shadow-md dark:bg-gray-800",
+    "flex items-center justify-between px-4 py-3 bg-white shadow-md dark:bg-gray-800",
   actions: "flex items-center gap-4",
   summaryContainer: "flex-1 flex justify-center max-w-2xl mx-auto"
 };
@@ -29,6 +30,7 @@ export async function Header({ data }: IHeaderProps) {
   return (
     <div className={styles.header}>
       <Logo text={logoText.label} />
+      {user.success && <SummaryForm />}
       <div className={styles.actions}>
         {
           user.success && user.data ? (
