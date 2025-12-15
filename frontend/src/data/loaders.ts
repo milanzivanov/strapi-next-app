@@ -1,8 +1,15 @@
 import qs from "qs";
-import type { TStrapiResponse, THomePage, TGlobal, TMetaData } from "@/types";
+import type {
+  TStrapiResponse,
+  THomePage,
+  TGlobal,
+  TMetaData,
+  TSummary
+} from "@/types";
 
 import { api } from "@/data/data-api";
 import { getStrapiURL } from "@/lib/utils";
+import { actions } from "./actions";
 
 const baseUrl = getStrapiURL();
 
@@ -68,8 +75,22 @@ async function getMetaData(): Promise<TStrapiResponse<TMetaData>> {
   return api.get<TMetaData>(url.href);
 }
 
+async function getSummaries(): Promise<TStrapiResponse<TSummary[]>> {
+  const authToken = await actions.auth.getAuthTokenAction();
+  if (!authToken) throw new Error("You are not authorized");
+
+  const query = qs.stringify({
+    sort: ["createdAt:desc"]
+  });
+
+  const url = new URL("/api/summaries", baseUrl);
+  url.search = query;
+  return api.get<TSummary[]>(url.href, { authToken });
+}
+
 export const loaders = {
   getHomePageData,
   getGlobalData,
-  getMetaData
+  getMetaData,
+  getSummaries
 };
