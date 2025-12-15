@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "summaries",
+  "info": {
+    "singularName": "summary",
+    "pluralName": "summaries",
+    "displayName": "Summary"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "userId": {
+      "type": "string"
+    },
+    "videoId": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    }
+  }
+}

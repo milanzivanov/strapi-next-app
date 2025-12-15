@@ -5,7 +5,11 @@ import {
 } from "./auth";
 import { updateProfileService, updateProfileImageService } from "./profile";
 import { fileUploadService, fileDeleteService } from "./file";
-import { generateTranscript, generateSummary } from "./summary";
+import {
+  generateTranscript,
+  generateSummary,
+  saveSummaryService
+} from "./summary";
 
 export const services = {
   auth: {
@@ -23,6 +27,7 @@ export const services = {
   },
   summarize: {
     generateTranscript,
-    generateSummary
+    generateSummary,
+    saveSummaryService
   }
 };

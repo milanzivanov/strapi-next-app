@@ -3,9 +3,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { cn, extractYouTubeID } from "@/lib/utils";
 import { api } from "@/data/data-api";
+import { useRouter } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/custom/submit-button";
+import { services } from "@/data/services";
 
 type ITranscriptResponse = {
   fullTranscript: string;
@@ -25,6 +27,7 @@ const INITIAL_STATE = {
 };
 
 export function SummaryForm() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<IErrors>(INITIAL_STATE);
   const [value, setValue] = useState<string>("");
@@ -106,8 +109,39 @@ export function SummaryForm() {
       console.log("sammery", summaryData);
 
       // Step 3: Save summary to database
-      // toast.dismiss(currentToastId);
-      // currentToastId = toast.loading("Saving summary...");
+      toast.dismiss(currentToastId);
+      currentToastId = toast.loading("Saving summary...");
+
+      const saveResponse = await services.summarize.saveSummaryService({
+        title:
+          transcriptResponse.data?.title || `Summary for ${processedVideoId}`,
+        content: summaryResponse.data,
+        videoId: processedVideoId
+      });
+
+      if (!saveResponse.success) {
+        toast.dismiss(currentToastId);
+        toast.error(saveResponse.error?.message);
+        return;
+      }
+
+      console.log("SAVE RESPONSE:", saveResponse);
+      toast.dismiss(currentToastId);
+      currentToastId = undefined;
+      toast.success("Summary Created and Saved!");
+      setValue("");
+
+      // Redirect to the summary details page
+      router.push("/dashboard/summaries/" + saveResponse.data?.documentId);
+
+      toast.success("Summary Created and Saved!");
+      setValue("");
+
+      // Redirect to the summary details page
+      router.push("/dashboard/summaries/" + saveResponse.data?.documentId);
+
+      toast.success("Summary Created and Saved!");
+      setValue("");
 
       toast.dismiss(currentToastId);
       toast.success("Summary Created and Saved!");
