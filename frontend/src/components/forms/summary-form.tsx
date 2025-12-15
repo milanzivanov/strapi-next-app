@@ -74,11 +74,36 @@ export function SummaryForm() {
         return;
       }
 
-      console.log(fullTranscript);
+      // console.log(fullTranscript);
 
       // Step 2: Generate summary
       toast.dismiss(currentToastId);
       currentToastId = toast.loading("Generating summary...");
+
+      const summaryResponse = await api.post<
+        string,
+        { fullTranscript: string }
+      >(
+        "/api/summarize",
+        { fullTranscript: fullTranscript },
+        { timeoutMs: 120000 }
+      );
+
+      if (!summaryResponse.success) {
+        toast.dismiss(currentToastId);
+        toast.error(summaryResponse.error?.message);
+        return;
+      }
+
+      const summaryData = summaryResponse.data;
+
+      if (!summaryData) {
+        toast.dismiss(currentToastId);
+        toast.error("No summary generated");
+        return;
+      }
+
+      console.log("sammery", summaryData);
 
       // Step 3: Save summary to database
       // toast.dismiss(currentToastId);

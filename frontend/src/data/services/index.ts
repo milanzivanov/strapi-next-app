@@ -1,24 +1,28 @@
-
-import { registerUserService, loginUserService,getUserMeService, } from "./auth";
+import {
+  registerUserService,
+  loginUserService,
+  getUserMeService
+} from "./auth";
 import { updateProfileService, updateProfileImageService } from "./profile";
 import { fileUploadService, fileDeleteService } from "./file";
-import { generateTranscript } from "./summary";
+import { generateTranscript, generateSummary } from "./summary";
 
 export const services = {
   auth: {
     registerUserService,
     loginUserService,
-    getUserMeService,
+    getUserMeService
   },
   profile: {
     updateProfileService,
-    updateProfileImageService,
+    updateProfileImageService
   },
   file: {
     fileUploadService,
-    fileDeleteService,
+    fileDeleteService
   },
   summarize: {
     generateTranscript,
-},
+    generateSummary
+  }
 };
