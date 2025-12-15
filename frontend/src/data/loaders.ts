@@ -88,9 +88,22 @@ async function getSummaries(): Promise<TStrapiResponse<TSummary[]>> {
   return api.get<TSummary[]>(url.href, { authToken });
 }
 
+async function getSummaryByDocumentId(
+  documentId: string
+): Promise<TStrapiResponse<TSummary>> {
+  const authToken = await actions.auth.getAuthTokenAction();
+  if (!authToken) throw new Error("You are not authorized");
+
+  const path = `/api/summaries/${documentId}`;
+  const url = new URL(path, baseUrl);
+
+  return api.get<TSummary>(url.href, { authToken });
+}
+
 export const loaders = {
   getHomePageData,
   getGlobalData,
   getMetaData,
-  getSummaries
+  getSummaries,
+  getSummaryByDocumentId
 };
