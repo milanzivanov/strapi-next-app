@@ -94,6 +94,18 @@ export async function apiRequest<T = unknown, P = Record<string, unknown>>(
     // Parse the JSON response for all other methods
     const data = await response.json();
 
+    // If server explicitly returns an error field, treat as error
+    if (data?.error) {
+      return {
+        error:
+          typeof data.error === "string"
+            ? { status: response.status, name: "Error", message: data.error }
+            : data.error,
+        success: false,
+        status: response.status
+      } as TStrapiResponse<T>;
+    }
+
     // Handle unsuccessful responses (4xx, 5xx status codes)
     if (!response.ok) {
       console.error(`API ${method} error (${response.status}):`, {

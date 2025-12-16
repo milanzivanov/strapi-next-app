@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/custom/submit-button";
+
 import { services } from "@/data/services";
 
 type ITranscriptResponse = {
@@ -34,11 +35,13 @@ export function SummaryForm() {
 
   async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    console.log("A: submitting");
     setLoading(true);
 
     const formData = new FormData(event.currentTarget);
     const videoId = formData.get("videoId") as string;
     const processedVideoId = extractYouTubeID(videoId);
+    // console.log("B: processedVideoId", processedVideoId);
 
     if (!processedVideoId) {
       toast.error("Invalid Youtube Video ID");
@@ -63,6 +66,8 @@ export function SummaryForm() {
         { videoId: string }
       >("/api/transcript", { videoId: processedVideoId });
 
+      // console.log("C: transcriptResponse", transcriptResponse);
+
       if (!transcriptResponse.success) {
         toast.dismiss(currentToastId);
         toast.error(transcriptResponse.error?.message);
@@ -71,13 +76,15 @@ export function SummaryForm() {
 
       const fullTranscript = transcriptResponse.data?.fullTranscript;
 
+      console.log("D: fullTranscript", fullTranscript);
+
       if (!fullTranscript) {
         toast.dismiss(currentToastId);
-        toast.error("No transcript data found");
+        toast.error("Unexpected: transcript missing from server response");
         return;
       }
 
-      // console.log(fullTranscript);
+      // console.log("//////////// full transcript", fullTranscript);
 
       // Step 2: Generate summary
       toast.dismiss(currentToastId);

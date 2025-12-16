@@ -23,7 +23,11 @@ export async function POST(req: NextRequest) {
     const transcriptData = await services.summarize.generateTranscript(videoId);
 
     if (!transcriptData?.fullTranscript) {
-      throw new Error("No transcript data found");
+      // Important: treat as error, not success
+      return new Response(
+        JSON.stringify({ data: null, error: "No transcript data found" }),
+        { status: 404 }
+      );
     }
 
     return new Response(JSON.stringify({ data: transcriptData, error: null }));

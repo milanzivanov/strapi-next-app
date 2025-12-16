@@ -1,18 +1,15 @@
-import {
-  TranscriptData,
-  TranscriptSegment,
-  YouTubeTranscriptSegment,
-  YouTubeAPIVideoInfo
-} from "@/types";
+import { Client, Caption } from "youtubei";
+
+import { TranscriptData, TranscriptSegment } from "@/types";
 
 const processTranscriptSegments = (
-  segments: YouTubeTranscriptSegment[]
+  captions: Caption[]
 ): TranscriptSegment[] => {
-  return segments.map((segment) => ({
-    text: segment.snippet.text,
-    start: Number(segment.start_ms),
-    end: Number(segment.end_ms),
-    duration: Number(segment.end_ms) - Number(segment.start_ms)
+  return captions.map((caption) => ({
+    text: caption.text,
+    start: caption.start,
+    end: caption.end, // Caption has an end getter
+    duration: caption.duration
   }));
 };
 
@@ -24,56 +21,36 @@ const validateIdentifier = (identifier: string): void => {
   }
 };
 
-const extractBasicInfo = (info: YouTubeAPIVideoInfo) => {
-  const { title, id: videoId, thumbnail } = info.basic_info;
-  const thumbnailUrl = thumbnail?.[0]?.url;
-
-  return {
-    title: title || "Untitled Video",
-    videoId,
-    thumbnailUrl: thumbnailUrl ? cleanImageUrl(thumbnailUrl) : undefined
-  };
-};
-
-const getTranscriptSegments = async (
-  info: YouTubeAPIVideoInfo
-): Promise<YouTubeTranscriptSegment[]> => {
-  const transcriptData = await info.getTranscript();
-
-  if (!transcriptData?.transcript?.content?.body?.initial_segments) {
-    throw new Error("No transcript available for this video");
-  }
-
-  return transcriptData.transcript.content.body.initial_segments;
-};
-
 export const generateTranscript = async (
   identifier: string
 ): Promise<TranscriptData> => {
   try {
-    const { Innertube } = await import("youtubei.js");
-    const youtube = await Innertube.create({
-      lang: "en",
-      location: "US",
-      retrieve_player: false
-    });
+    const youtube = new Client();
 
     validateIdentifier(identifier);
 
-    const info = await youtube.getInfo(identifier);
+    // 1) Get video info
+    const video = await youtube.getVideo(identifier);
 
-    if (!info) {
+    if (!video) {
       throw new Error("No video information found");
     }
 
-    const { title, videoId, thumbnailUrl } = extractBasicInfo(
-      info as YouTubeAPIVideoInfo
-    );
-    const segments = await getTranscriptSegments(info as YouTubeAPIVideoInfo);
-    const transcriptWithTimeCodes = processTranscriptSegments(segments);
-    const fullTranscript = segments
-      .map((segment) => segment.snippet.text)
-      .join(" ");
+    const title = video.title || "Untitled Video";
+    const videoId = video.id;
+    const thumbnailUrl = video.thumbnails?.[0]?.url
+      ? cleanImageUrl(video.thumbnails[0].url)
+      : undefined;
+
+    // 2) Get transcript (captions)
+    const captions = await youtube.getVideoTranscript(identifier);
+
+    if (!captions || captions.length === 0) {
+      throw new Error("No transcript available for this video");
+    }
+
+    const transcriptWithTimeCodes = processTranscriptSegments(captions);
+    const fullTranscript = captions.map((c) => c.text).join(" ");
 
     return {
       title,
