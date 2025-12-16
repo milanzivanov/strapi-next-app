@@ -3,7 +3,7 @@
 import type { MDXEditorMethods, MDXEditorProps } from "@mdxeditor/editor";
 import { AlertCircle } from "lucide-react";
 import dynamic from "next/dynamic";
-import { forwardRef } from "react";
+import { useState, forwardRef } from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -40,8 +40,7 @@ export function EditorWrapper({
   onChange,
   className
 }: EditorWrapperProps) {
-  // const [hasError, setHasError] = useState(false);
-  const hasError = false;
+  const [hasError] = useState(false);
 
   // useEffect(() => {
   //   if (typeof window !== "undefined") {
