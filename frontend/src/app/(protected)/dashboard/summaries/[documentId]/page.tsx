@@ -4,7 +4,7 @@ import { extractYouTubeID } from "@/lib/utils";
 import { validateApiResponse } from "@/lib/error-handler";
 import { notFound } from "next/navigation";
 import { YouTubePlayer } from "@/components/custom/youtube-player";
-import { SummaryUpdateForm } from "@/components/custom/editor";
+import { SummaryUpdateForm } from "@/components/forms/summary-update-form";
 
 interface IPageProps {
   params: Params;
