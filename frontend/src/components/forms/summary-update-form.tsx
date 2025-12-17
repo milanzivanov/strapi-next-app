@@ -1,15 +1,38 @@
 "use client";
-import { useState, useEffect, useCallback, useRef } from "react";
 import type { TSummary } from "@/types";
+import EditorWrapper from "../custom/editor/editor-wrapper";
+
+import { actions } from "@/data/actions";
+import type {
+  SummaryUpdateFormState,
+  SummaryDeleteFormState
+} from "@/data/validation/summary";
 
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/custom/submit-button";
 import { DeleteButton } from "@/components/custom/delete-button";
-import EditorWrapper from "../custom/editor/editor-wrapper";
+
+import { ZodErrors } from "@/components/custom/zod-errors";
+import { StrapiErrors } from "@/components/custom/strapi-errors";
+import { useActionState } from "react";
 
 interface ISummaryUpdateFormProps {
   summary: TSummary;
 }
+
+const INITIAL_UPDATE_STATE: SummaryUpdateFormState = {
+  success: false,
+  message: undefined,
+  strapiErrors: null,
+  zodErrors: null
+};
+
+const INITIAL_DELETE_STATE: SummaryDeleteFormState = {
+  success: false,
+  message: undefined,
+  strapiErrors: null,
+  zodErrors: null
+};
 
 const styles = {
   container: "flex flex-col px-2 py-0.5 relative",
@@ -18,45 +41,54 @@ const styles = {
   buttonContainer: "mt-3",
   updateButton: "inline-block",
   deleteFormContainer: "absolute bottom-0 right-2",
-  deleteButton: "bg-pink-500 hover:bg-pink-600"
+  deleteButton: "bg-pink-500 hover:bg-pink-600",
+  fieldGroup: "space-y-1"
 };
 
 export function SummaryUpdateForm({ summary }: ISummaryUpdateFormProps) {
-  const [content, setContent] = useState(summary.content);
-  const mountedRef = useRef(false);
+  const [updateFormState, updateFormAction] = useActionState(
+    actions.summary.updateSummaryAction,
+    INITIAL_UPDATE_STATE
+  );
 
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
-
-  const handleEditorChange = useCallback((value: string) => {
-    if (!mountedRef.current) return;
-    setContent(value);
-  }, []);
+  const [deleteFormState, deleteFormAction] = useActionState(
+    actions.summary.deleteSummaryAction,
+    INITIAL_DELETE_STATE
+  );
 
   return (
     <div className={styles.container}>
-      <form>
+      <form action={updateFormAction}>
+        <input type="hidden" name="documentId" value={summary.documentId} />
+
         <Input
           id="title"
           name="title"
           type="text"
           placeholder={"Title"}
-          defaultValue={summary.title || ""}
+          defaultValue={updateFormState?.data?.title || summary.title || ""}
           className={styles.titleInput}
         />
 
-        <input type="hidden" name="content" value={content} />
+        <input
+          type="hidden"
+          name="content"
+          defaultValue={updateFormState?.data?.content || summary.content}
+        />
 
-        <div>
+        <div className={styles.fieldGroup}>
           <EditorWrapper
-            markdown={summary.content}
-            onChange={handleEditorChange}
+            markdown={updateFormState?.data?.content || summary.content}
+            onChange={(value) => {
+              const hiddenInput = document.querySelector(
+                'input[name="content"]'
+              ) as HTMLInputElement;
+              if (hiddenInput) hiddenInput.value = value;
+            }}
             className={styles.editor}
           />
+
+          <ZodErrors error={updateFormState?.zodErrors?.content} />
         </div>
 
         <div className={styles.buttonContainer}>
@@ -67,12 +99,29 @@ export function SummaryUpdateForm({ summary }: ISummaryUpdateFormProps) {
             />
           </div>
         </div>
+
+        <StrapiErrors error={updateFormState?.strapiErrors} />
+
+        {updateFormState?.success && (
+          <div className="text-green-600 mt-2">{updateFormState.message}</div>
+        )}
+        {updateFormState?.message && !updateFormState?.success && (
+          <div className="text-red-600 mt-2">{updateFormState.message}</div>
+        )}
       </form>
 
       <div className={styles.deleteFormContainer}>
-        <form onSubmit={() => console.log("DELETE FORM SUBMITTED")}>
+        <form action={deleteFormAction}>
+          <input type="hidden" name="documentId" value={summary.documentId} />
           <DeleteButton className={styles.deleteButton} />
         </form>
+
+        <StrapiErrors error={deleteFormState?.strapiErrors} />
+        {deleteFormState?.message && !deleteFormState?.success && (
+          <div className="text-red-600 mt-1 text-sm">
+            {deleteFormState.message}
+          </div>
+        )}
       </div>
     </div>
   );

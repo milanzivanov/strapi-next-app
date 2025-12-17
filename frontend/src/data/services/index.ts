@@ -8,7 +8,9 @@ import { fileUploadService, fileDeleteService } from "./file";
 import {
   generateTranscript,
   generateSummary,
-  saveSummaryService
+  saveSummaryService,
+  updateSummaryService,
+  deleteSummaryService
 } from "./summary";
 
 export const services = {
@@ -28,6 +30,8 @@ export const services = {
   summarize: {
     generateTranscript,
     generateSummary,
-    saveSummaryService
+    saveSummaryService,
+    updateSummaryService,
+    deleteSummaryService
   }
 };
