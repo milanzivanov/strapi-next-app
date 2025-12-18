@@ -12,10 +12,10 @@
   "pluginOptions": {},
   "attributes": {
     "userId": {
-      "type": "string"
+      "type": "text"
     },
     "videoId": {
-      "type": "string"
+      "type": "text"
     },
     "title": {
       "type": "text"
