@@ -18,10 +18,10 @@
       "type": "string"
     },
     "title": {
-      "type": "string"
+      "type": "text"
     },
     "content": {
-      "type": "string"
+      "type": "text"
     }
   }
 }
