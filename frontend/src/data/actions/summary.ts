@@ -12,6 +12,7 @@ import {
   type SummaryDeleteFormState
 } from "@/data/validation/summary";
 
+// Update a summary
 export async function updateSummaryAction(
   prevState: SummaryUpdateFormState,
   formData: FormData
@@ -84,6 +85,7 @@ export async function updateSummaryAction(
   }
 }
 
+// Delete a summary
 export async function deleteSummaryAction(
   prevState: SummaryDeleteFormState,
   formData: FormData
