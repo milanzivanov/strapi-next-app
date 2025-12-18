@@ -76,9 +76,10 @@ async function getMetaData(): Promise<TStrapiResponse<TMetaData>> {
   return api.get<TMetaData>(url.href);
 }
 
-// summaries
+// summaries with search and pagination
 async function getSummaries(
-  queryString: string
+  queryString: string,
+  page: number = 1
 ): Promise<TStrapiResponse<TSummary[]>> {
   const authToken = await actions.auth.getAuthTokenAction();
   if (!authToken) throw new Error("You are not authorized");
@@ -92,7 +93,11 @@ async function getSummaries(
           { content: { $containsi: queryString } }
         ]
       }
-    })
+    }),
+    pagination: {
+      page,
+      pageSize: process.env.PAGE_SIZE || 4
+    }
   });
 
   const url = new URL("/api/summaries", baseUrl);
