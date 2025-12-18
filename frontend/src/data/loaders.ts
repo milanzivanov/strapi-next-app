@@ -10,6 +10,7 @@ import type {
 import { api } from "@/data/data-api";
 import { getStrapiURL } from "@/lib/utils";
 import { actions } from "./actions";
+import QueryString from "qs";
 
 const baseUrl = getStrapiURL();
 
@@ -75,12 +76,23 @@ async function getMetaData(): Promise<TStrapiResponse<TMetaData>> {
   return api.get<TMetaData>(url.href);
 }
 
-async function getSummaries(): Promise<TStrapiResponse<TSummary[]>> {
+// summaries
+async function getSummaries(
+  queryString: string
+): Promise<TStrapiResponse<TSummary[]>> {
   const authToken = await actions.auth.getAuthTokenAction();
   if (!authToken) throw new Error("You are not authorized");
 
   const query = qs.stringify({
-    sort: ["createdAt:desc"]
+    sort: ["createdAt:desc"],
+    ...(QueryString && {
+      filters: {
+        $or: [
+          { title: { $containsi: queryString } },
+          { content: { $containsi: queryString } }
+        ]
+      }
+    })
   });
 
   const url = new URL("/api/summaries", baseUrl);
