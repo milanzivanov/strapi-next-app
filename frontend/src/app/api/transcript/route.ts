@@ -4,6 +4,8 @@ import { services } from "@/data/services";
 
 export const maxDuration = 150;
 export const dynamic = "force-dynamic";
+// Ensure this route runs on the Node.js runtime (required for youtubei)
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   const user = await services.auth.getUserMeService();
@@ -44,9 +46,15 @@ export async function POST(req: NextRequest) {
 
     return new Response(JSON.stringify({ data: transcriptData, error: null }));
   } catch (error) {
-    console.error("Error processing request:", error);
-    if (error instanceof Error)
-      return new Response(JSON.stringify({ error: error.message }));
-    return new Response(JSON.stringify({ error: "Unknown error" }));
+    console.error("Error processing transcript request:", error);
+
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Failed to fetch transcript. Please try again.";
+
+    return new Response(JSON.stringify({ data: null, error: message }), {
+      status: 500
+    });
   }
 }
