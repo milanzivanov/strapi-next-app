@@ -61,8 +61,18 @@ export const generateTranscript = async (
     };
   } catch (error) {
     console.error("Error fetching transcript:", error);
-    throw new Error(
-      error instanceof Error ? error.message : "Failed to fetch transcript"
-    );
+
+    let message =
+      error instanceof Error ? error.message : "Failed to fetch transcript";
+
+    // In some environments the youtubei client throws a vague
+    // "Cannot read properties of undefined (reading 'videoId')" error.
+    // Replace this with a clearer, user-friendly message.
+    if (message.includes("videoId")) {
+      message =
+        "Transcript not available for this video (or YouTube changed their transcript API). Try a different video.";
+    }
+
+    throw new Error(message);
   }
 };
