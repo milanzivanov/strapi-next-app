@@ -16,8 +16,20 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const body = await req.json();
-  const videoId = body.videoId;
+  let videoId: string | undefined;
+  try {
+    const body = await req.json();
+    videoId = body?.videoId;
+  } catch {
+    videoId = undefined;
+  }
+
+  if (!videoId || typeof videoId !== "string") {
+    return new Response(
+      JSON.stringify({ data: null, error: "No videoId provided" }),
+      { status: 400 }
+    );
+  }
 
   try {
     const transcriptData = await services.summarize.generateTranscript(videoId);
