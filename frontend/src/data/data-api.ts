@@ -23,7 +23,7 @@ type ApiOptions<P = Record<string, unknown>> = {
 async function apiWithTimeout(
   input: RequestInfo,
   init: RequestInit = {},
-  timeoutMs = 8000 // 8 seconds default - good balance between patience and UX
+  timeoutMs = 15000 // 15 seconds default - increased for better stability
 ): Promise<Response> {
   // Create controller to manage request cancellation
   const controller = new AbortController();
